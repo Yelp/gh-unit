@@ -81,7 +81,7 @@ BOOL GHTestStatusEnded(GHTestStatus status) {
 @implementation GHTest
 
 @synthesize delegate=delegate_, target=target_, selector=selector_, name=name_, interval=interval_, 
-exception=exception_, status=status_, log=log_, identifier=identifier_, disabled=disabled_, hidden=hidden_;
+exception=exception_, status=status_, log=log_, identifier=identifier_, disabled=disabled_, hidden=hidden_, passingImages=passingImages_;
 
 - (id)initWithIdentifier:(NSString *)identifier name:(NSString *)name {
   if ((self = [self init])) {
@@ -212,6 +212,10 @@ exception=exception_, status=status_, log=log_, identifier=identifier_, disabled
 
   if (exception_) {
     status_ = GHTestStatusErrored;
+  }
+  
+  if ([target_ respondsToSelector:@selector(passingImages)]) {
+    passingImages_ = [target_ performSelector:@selector(passingImages)];
   }
 
   if (status_== GHTestStatusCancelling) {

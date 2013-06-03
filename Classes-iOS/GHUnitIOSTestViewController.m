@@ -74,10 +74,13 @@
 - (NSString *)updateTestView {
   NSMutableString *text = [NSMutableString stringWithCapacity:200];
   [text appendFormat:@"%@ %@\n", [testNode_ identifier], [testNode_ statusString]];
+  
   NSString *log = [testNode_ log];
   if (log) [text appendFormat:@"\nLog:\n%@\n", log];
+  
   NSString *stackTrace = [testNode_ stackTrace];
   if (stackTrace) [text appendFormat:@"\n%@\n", stackTrace];
+  
   if ([testNode_.test.exception.name isEqualToString:@"GHViewChangeException"]) {
     NSDictionary *exceptionUserInfo = testNode_.test.exception.userInfo;
     UIImage *savedImage = [exceptionUserInfo objectForKey:@"SavedImage"];
@@ -88,6 +91,10 @@
     UIImage *renderedImage = [exceptionUserInfo objectForKey:@"RenderedImage"];
     [testView_ setSavedImage:nil renderedImage:renderedImage text:text];
   } else {
+    NSArray *passingImages = testNode_.test.passingImages;
+    if (passingImages) {
+      [testView_ setPassingImages:passingImages];
+    }
     [testView_ setText:text];
   }
   return text;
@@ -121,6 +128,17 @@
   [GHViewTestCase saveApprovedViewTestImage:renderedImage filename:imageFilename];
   testNode_.test.status = GHTestStatusSucceeded;
   [self _runTest];
+}
+
+- (void)testView:(GHUnitIOSTestView *)testView didOpenImage:(UIImage *)image {
+  UIView *view = [[UIView alloc] init];
+  UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
+  imageView.frame = CGRectMake(0, 0, 320, image.size.height * roundf(320 / image.size.width));
+  [view addSubview:imageView];
+  
+  UIViewController *viewController = [[UIViewController alloc] init];
+  viewController.view = view;
+  [self.navigationController pushViewController:viewController animated:YES];
 }
 
 @end

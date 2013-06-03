@@ -36,6 +36,7 @@
 - (void)testViewDidSelectSavedImage:(GHUnitIOSTestView *)testView;
 - (void)testViewDidSelectRenderedImage:(GHUnitIOSTestView *)testView;
 - (void)testViewDidApproveChange:(GHUnitIOSTestView *)testView;
+- (void)testView:(GHUnitIOSTestView *)testView didOpenImage:(UIImage *)image;
 @end
 
 @interface GHUnitIOSTestView : UIScrollView {
@@ -49,11 +50,15 @@
   UIButton *approveButton_;
 
   UILabel *textLabel_;
+  
+  NSMutableArray *passingImageViews_;
 }
 @property(unsafe_unretained, nonatomic) id<GHUnitIOSTestViewDelegate> controlDelegate;
 
 - (void)setSavedImage:(UIImage *)savedImage renderedImage:(UIImage *)renderedImage text:(NSString *)text;
 
 - (void)setText:(NSString *)text;
+
+- (void)setPassingImages:(NSArray *)/*of UIImage*/passingImages;
 
 @end

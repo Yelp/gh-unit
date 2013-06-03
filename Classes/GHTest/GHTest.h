@@ -141,6 +141,11 @@ extern NSString *NSStringFromGHTestStats(GHTestStats stats);
 @property (assign, nonatomic) id<GHTestDelegate> delegate; // weak
 
 /*!
+ Array of UIImages that passed the current test.
+ */
+@property (readonly, nonatomic) NSArray *passingImages;
+
+/*!
  Run the test.
  @param options Options
  */
@@ -241,7 +246,7 @@ extern NSString *NSStringFromGHTestStats(GHTestStats stats);
   NSException *exception_; // If failed
     
   NSMutableArray *log_;
-
+  NSArray *passingImages_;
 }
 
 @property (readonly, strong, nonatomic) id target;

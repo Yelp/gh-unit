@@ -106,8 +106,29 @@
   CGRect textViewFrame = textLabel_.frame;
   textViewFrame.origin.y = y;
   textLabel_.frame = textViewFrame;
+  y += textLabelFrame.size.height + 5;
   
-  self.contentSize = CGSizeMake(self.frame.size.width, textViewFrame.origin.y + textViewFrame.size.height + 10);
+  if (passingImageViews_) {
+    CGFloat imageMargin = 5;
+    CGFloat x = imageMargin;
+    CGFloat imageWidth = 100;
+    CGFloat rowHeight = 0;
+    for (UIImageView *imageView in passingImageViews_) {
+      CGFloat aspectRatio = imageView.image.size.height / imageView.image.size.width;
+      CGRect imageFrame = CGRectMake(x, y, imageWidth, aspectRatio * imageWidth);
+      imageView.frame = imageFrame;
+      
+      x += imageWidth + imageMargin;
+      rowHeight = MAX(rowHeight, imageFrame.size.height);
+      if (x >= 320) {
+        x = imageMargin;
+        y += rowHeight + imageMargin;
+      }
+    }
+    y += rowHeight;
+  }
+  
+  self.contentSize = CGSizeMake(self.frame.size.width, y + 5);
 }
 
 - (void)_selectSavedImage {
@@ -138,6 +159,22 @@
   approveButton_.hidden = YES;
   textLabel_.text = text;
   [self _layout];
+}
+
+- (void)setPassingImages:(NSArray *)passingImages {
+  passingImageViews_ = [[NSMutableArray alloc] initWithCapacity:[passingImages count]];
+  for (UIImage *image in passingImages) {
+    GHUIImageViewControl *imageControl = [[GHUIImageViewControl alloc] init];
+    [imageControl addTarget:self action:@selector(_passingImageSelected:) forControlEvents:UIControlEventTouchUpInside];
+    imageControl.image = image;
+    [passingImageViews_ addObject:imageControl];
+    [self addSubview:imageControl];
+  }
+  [self _layout];
+}
+
+- (void)_passingImageSelected:(GHUIImageViewControl *)sender {
+  [controlDelegate_ testView:self didOpenImage:sender.image];
 }
 
 @end

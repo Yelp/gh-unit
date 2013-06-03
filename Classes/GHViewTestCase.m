@@ -37,6 +37,8 @@ typedef struct {
 
 @implementation GHViewTestCase
 
+@synthesize passingImages=passingImages_;
+
 #pragma mark File Operations
 
 + (NSString *)approvedTestImagesDirectory {
@@ -223,6 +225,7 @@ typedef struct {
 
 - (void)_setUp {
   imageVerifyCount_ = 0;
+  passingImages_ = [[NSMutableArray alloc] init];
 }
 
 + (UIImage *)_imageFromFilePath:(NSString *)filePath {
@@ -293,6 +296,7 @@ typedef struct {
     [[NSException exceptionWithName:@"GHViewChangeException" reason:@"View has changed" userInfo:exceptionDictionary] raise];
   }
   imageVerifyCount_++;
+  [passingImages_ addObject:originalViewImage];
 }
 
 @end

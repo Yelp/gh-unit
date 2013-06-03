@@ -87,7 +87,13 @@ reason:@"GHVerifyView can only be called from within a GHViewTestCase class"] ra
  */
 @interface GHViewTestCase : GHTestCase {
   NSInteger imageVerifyCount_;
+  NSMutableArray *passingImages_;
 }
+
+/*!
+ Array of all test images that passed for this test case.
+ */
+@property (readonly, nonatomic) NSArray *passingImages;
 
 /*!
  Clear all test images in the documents directory.
