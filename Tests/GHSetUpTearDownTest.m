@@ -58,8 +58,8 @@ static NSInteger tearDownClassCount = 0;
   
 }
 
-- (void)test3 { 
-
+- (void)test3_EXPECTED {
+  GHFail(@"Test fail");
 }
 
 @end
