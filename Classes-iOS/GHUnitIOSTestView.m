@@ -30,114 +30,139 @@
 #import "GHUnitIOSTestView.h"
 #import <QuartzCore/QuartzCore.h>
 
-@implementation GHUnitIOSTestView
+@interface GHUnitIOSTestView ()
 
-@synthesize controlDelegate=controlDelegate_;
+// TODO(johnb): Perhaps hold a scrollview here as subclassing UIViews can be weird.
+@property (strong, nonatomic) UIView *contentView;
+@property (strong, nonatomic) GHUIImageViewControl *savedImageView;
+@property (strong, nonatomic) GHUIImageViewControl *renderedImageView;
+@property (strong, nonatomic) UIButton *approveButton;
+@property (strong, nonatomic) UILabel *textLabel;
+
+@property (strong, nonatomic) NSMutableArray *updateableConstraints;
+
+@end
+
+@implementation GHUnitIOSTestView
 
 - (id)initWithFrame:(CGRect)frame {
   if ((self = [super initWithFrame:frame])) {
     self.backgroundColor = [UIColor whiteColor];
-
-    textLabel_ = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, 300, 100)];
-    textLabel_.font = [UIFont systemFontOfSize:12];
-    textLabel_.textColor = [UIColor blackColor];
-    textLabel_.numberOfLines = 0;
-    [self addSubview:textLabel_];
-
-    savedImageView_ = [[GHUIImageViewControl alloc] initWithFrame:CGRectMake(10, 10, 145, 100)];
-    [savedImageView_ addTarget:self action:@selector(_selectSavedImage) forControlEvents:UIControlEventTouchUpInside];
-    [savedImageView_.layer setBorderWidth:2.0];
-    [savedImageView_.layer setBorderColor:[UIColor blackColor].CGColor];
-    savedImageView_.hidden = YES;
-    [self addSubview:savedImageView_];
-
-    renderedImageView_ = [[GHUIImageViewControl alloc] initWithFrame:CGRectMake(165, 10, 145, 100)];
-    [renderedImageView_ addTarget:self action:@selector(_selectRenderedImage) forControlEvents:UIControlEventTouchUpInside];
-    [renderedImageView_.layer setBorderWidth:2.0];
-    [renderedImageView_.layer setBorderColor:[UIColor blackColor].CGColor];
-    renderedImageView_.hidden = YES;
-    [self addSubview:renderedImageView_];
-
-    approveButton_ = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    [approveButton_ addTarget:self action:@selector(_approveChange) forControlEvents:UIControlEventTouchUpInside];
-    approveButton_.hidden = YES;
-    [approveButton_ setTitle:@"Approve this change" forState:UIControlStateNormal];
-    [approveButton_ setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    approveButton_.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:18];
-    [self addSubview:approveButton_];
+    
+    _contentView = [[UIView alloc] init];
+    _contentView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:_contentView];
+    
+    _textLabel = [[UILabel alloc] init];
+    _textLabel.font = [UIFont systemFontOfSize:12];
+    _textLabel.textColor = [UIColor blackColor];
+    _textLabel.numberOfLines = 0;
+    _textLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    [_contentView addSubview:_textLabel];
+    
+    _savedImageView = [[GHUIImageViewControl alloc] init];
+    [_savedImageView addTarget:self action:@selector(_selectSavedImage) forControlEvents:UIControlEventTouchUpInside];
+    [_savedImageView.layer setBorderWidth:2.0];
+    [_savedImageView.layer setBorderColor:[UIColor blackColor].CGColor];
+    _savedImageView.hidden = YES;
+    _savedImageView.translatesAutoresizingMaskIntoConstraints = NO;
+    [_contentView addSubview:_savedImageView];
+    
+    _renderedImageView = [[GHUIImageViewControl alloc] init];
+    [_renderedImageView addTarget:self action:@selector(_selectRenderedImage) forControlEvents:UIControlEventTouchUpInside];
+    [_renderedImageView.layer setBorderWidth:2.0];
+    [_renderedImageView.layer setBorderColor:[UIColor blackColor].CGColor];
+    _renderedImageView.hidden = YES;
+    _renderedImageView.translatesAutoresizingMaskIntoConstraints = NO;
+    [_contentView addSubview:_renderedImageView];
+    
+    _approveButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    [_approveButton addTarget:self action:@selector(_approveChange) forControlEvents:UIControlEventTouchUpInside];
+    _approveButton.hidden = YES;
+    [_approveButton setTitle:@"Approve this change" forState:UIControlStateNormal];
+    [_approveButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    _approveButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:18];
+    _approveButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [_contentView addSubview:_approveButton];
+    
+    _updateableConstraints = [[NSMutableArray alloc] init];
+    
+    [self _installConstraints];
   }
   return self;
 }
 
-/*
- Real layout is not in layoutSubviews since scrollviews call layoutSubviews on every frame
- */
-- (void)_layout {
-  CGFloat y = 10;
-  CGRect savedImageFrame = CGRectZero;
-  CGRect renderedImageFrame = CGRectZero;
+- (void)_installConstraints {
+  NSDictionary *views = NSDictionaryOfVariableBindings(self, _contentView, _textLabel, _savedImageView, _renderedImageView, _approveButton);
+  
+  [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_contentView]|" options:0 metrics:nil views:views]];
+  [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_contentView(320)]|" options:0 metrics:nil views:views]];
+  
+  // Fix text view to sides and bottom of the content view
+  [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-10-[_textLabel]-10-|" options:0 metrics:nil views:views]];
+  [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_textLabel]-10-|" options:0 metrics:nil views:views]];
+  [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[_savedImageView(145)]-[_renderedImageView(145)]" options:NSLayoutFormatAlignAllTop metrics:nil views:views]];
+  [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-10-[_approveButton]-10-|" options:NSLayoutFormatAlignAllTop metrics:nil views:views]];
 
-  CGRect textLabelFrame = textLabel_.frame;
-  textLabelFrame.size.height = [textLabel_.text sizeWithFont:textLabel_.font constrainedToSize:CGSizeMake(textLabel_.frame.size.width, 10000) lineBreakMode:UILineBreakModeWordWrap].height;
-  textLabel_.frame = textLabelFrame;
+}
 
-  if (savedImageView_.image && !savedImageView_.hidden) {
-    // Adjust image views to their sizes, maintaining constant width
-    CGFloat aspectRatio = savedImageView_.image.size.height / savedImageView_.image.size.width;
-    savedImageFrame = savedImageView_.frame;
-    savedImageFrame.size.height = aspectRatio * savedImageFrame.size.width;
-    savedImageView_.frame = savedImageFrame;
+- (void)updateConstraints {
+  NSDictionary *views = NSDictionaryOfVariableBindings(self, _contentView, _textLabel, _savedImageView, _renderedImageView, _approveButton);
+  
+  [self.contentView removeConstraints:self.updateableConstraints];
+  [self.updateableConstraints removeAllObjects];
+  
+  if (self.savedImageView.hidden && self.renderedImageView.hidden) {
+    [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-10-[_textLabel]" options:0 metrics:nil views:views]];
+  } else {
+    [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-10-[_approveButton]-10-[_savedImageView]" options:0 metrics:nil views:views]];
+    [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_savedImageView]-(>=10)-[_textLabel]" options:NSLayoutFormatAlignAllLeft metrics:nil views:views]];
+    [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_renderedImageView]-(>=10)-[_textLabel]" options:0 metrics:nil views:views]];
+    
+    CGFloat aspectRatio = self.savedImageView.image.size.height / self.savedImageView.image.size.width;
+    CGFloat height = aspectRatio * 145.0;
+    [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[_savedImageView(%f)]", height] options:0 metrics:nil views:views]];
+
+    aspectRatio = self.renderedImageView.image.size.height / self.renderedImageView.image.size.width;
+    height = aspectRatio * 145.0;
+    [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[_renderedImageView(%f)]", height] options:0 metrics:nil views:views]];
   }
   
-  if (renderedImageView_.image && !renderedImageView_.hidden) {
-    CGFloat aspectRatio = renderedImageView_.image.size.height / renderedImageView_.image.size.width;
-    renderedImageFrame = renderedImageView_.frame;
-    renderedImageFrame.size.height = aspectRatio * renderedImageFrame.size.width;
-    renderedImageView_.frame = renderedImageFrame;
-  }
-
-  y += roundf(MAX(savedImageFrame.size.height, renderedImageFrame.size.height) + 10);
-
-  if (!approveButton_.hidden) {
-    approveButton_.frame = CGRectMake(10, y, 300, 30);
-    y += 40;
-  }
-
-  CGRect textViewFrame = textLabel_.frame;
-  textViewFrame.origin.y = y;
-  textLabel_.frame = textViewFrame;
-  
-  self.contentSize = CGSizeMake(self.frame.size.width, textViewFrame.origin.y + textViewFrame.size.height + 10);
+  [_contentView addConstraints:self.updateableConstraints];
+  [super updateConstraints];
 }
 
 - (void)_selectSavedImage {
-  [controlDelegate_ testViewDidSelectSavedImage:self];
+  [self.controlDelegate testViewDidSelectSavedImage:self];
 }
 
 - (void)_selectRenderedImage {
-  [controlDelegate_ testViewDidSelectRenderedImage:self];  
+  [self.controlDelegate testViewDidSelectRenderedImage:self];
 }
 
 - (void)_approveChange {
-  [controlDelegate_ testViewDidApproveChange:self];
+  [self.controlDelegate testViewDidApproveChange:self];
+}
+
+- (void)setSavedImage:(UIImage *)savedImage text:(NSString *)text {
 }
 
 - (void)setSavedImage:(UIImage *)savedImage renderedImage:(UIImage *)renderedImage text:(NSString *)text {
-  savedImageView_.image = savedImage;
-  savedImageView_.hidden = savedImage ? NO : YES;
-  renderedImageView_.image = renderedImage;
-  renderedImageView_.hidden = NO;
-  approveButton_.hidden = NO;
-  textLabel_.text = text;
-  [self _layout];
+  self.savedImageView.image = savedImage;
+  self.savedImageView.hidden = savedImage ? NO : YES;
+  self.renderedImageView.image = renderedImage;
+  self.renderedImageView.hidden = renderedImage ? NO : YES;
+  self.approveButton.hidden = NO;
+  self.textLabel.text = text;
+  [self setNeedsUpdateConstraints];
 }
 
 - (void)setText:(NSString *)text {
-  savedImageView_.hidden = YES;
-  renderedImageView_.hidden = YES;
-  approveButton_.hidden = YES;
-  textLabel_.text = text;
-  [self _layout];
+  self.savedImageView.hidden = YES;
+  self.renderedImageView.hidden = YES;
+  self.approveButton.hidden = YES;
+  self.textLabel.text = text;
+  [self setNeedsUpdateConstraints];
 }
 
 @end
