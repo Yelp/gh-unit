@@ -36,6 +36,7 @@
 - (void)testViewDidSelectSavedImage:(GHUnitIOSTestView *)testView;
 - (void)testViewDidSelectRenderedImage:(GHUnitIOSTestView *)testView;
 - (void)testViewDidApproveChange:(GHUnitIOSTestView *)testView;
+- (void)testViewDidRunTest:(GHUnitIOSTestView *)testView;
 @end
 
 @interface GHUnitIOSTestView : UIScrollView

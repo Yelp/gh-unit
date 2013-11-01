@@ -34,13 +34,11 @@
 
 - (id)init {
   if ((self = [super init])) {
-    UIBarButtonItem *runButton = [[UIBarButtonItem alloc] initWithTitle:@"Re-run" style:UIBarButtonItemStyleDone
-                                                 target:self action:@selector(_runTest)];
-    self.navigationItem.rightBarButtonItem = runButton;
+    UIBarButtonItem *nextButton = [[UIBarButtonItem alloc] initWithTitle:@"Next" style:UIBarButtonItemStyleDone target:self action:@selector(_loadNextFailingTest)];
+    self.navigationItem.rightBarButtonItem = nextButton;
   }
   return self;
 }
-
 
 - (void)loadView {
   testView_ = [[GHUnitIOSTestView alloc] initWithFrame:CGRectMake(0, 0, 320, 460)];
@@ -50,6 +48,13 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
   return YES;
+}
+
+- (void)_loadNextFailingTest {
+  id<GHTest> test = [self.delegate testViewControllerLoadedNextFailingTest:self];
+  if (test) {
+    [self setTest:test];
+  }
 }
 
 - (void)_runTest {
@@ -124,6 +129,10 @@
   UIImage *renderedImage = [testNode_.test.exception.userInfo objectForKey:@"RenderedImage"];
   [GHViewTestCase saveApprovedViewTestImage:renderedImage filename:imageFilename];
   testNode_.test.status = GHTestStatusSucceeded;
+  [self _runTest];
+}
+
+- (void)testViewDidRunTest:(GHUnitIOSTestView *)testView {
   [self _runTest];
 }
 

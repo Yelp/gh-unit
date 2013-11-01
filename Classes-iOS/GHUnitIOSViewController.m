@@ -33,10 +33,9 @@ NSString *const GHUnitTextFilterKey = @"TextFilter";
 NSString *const GHUnitFilterKey = @"Filter";
 
 @interface GHUnitIOSViewController ()
-- (NSString *)_textFilter;
-- (void)_setTextFilter:(NSString *)textFilter;
-- (void)_setFilterIndex:(NSInteger)index;
-- (NSInteger)_filterIndex;
+
+@property (strong, nonatomic) NSIndexPath *lastSelectedIndexPath;
+
 @end
 
 @implementation GHUnitIOSViewController
@@ -201,9 +200,11 @@ NSString *const GHUnitFilterKey = @"Filter";
     GHTestNode *sectionNode = [[[dataSource_ root] children] objectAtIndex:indexPath.section];
     GHTestNode *testNode = [[sectionNode children] objectAtIndex:indexPath.row];
     
-    GHUnitIOSTestViewController *testViewController = [[GHUnitIOSTestViewController alloc] init]; 
+    GHUnitIOSTestViewController *testViewController = [[GHUnitIOSTestViewController alloc] init];
+    testViewController.delegate = self;
     [testViewController setTest:testNode.test];
     [self.navigationController pushViewController:testViewController animated:YES];
+    self.lastSelectedIndexPath = indexPath;
   }
 }
 
@@ -306,6 +307,29 @@ NSString *const GHUnitFilterKey = @"Filter";
   
   [self _setTextFilter:searchBar.text];
   [self reload];
+}
+
+#pragma mark Delegates (GHUnitIOSTestViewController)
+
+- (id<GHTest>)testViewControllerLoadedNextFailingTest:(GHUnitIOSTestViewController *)controller {
+  NSUInteger sectionIndex = self.lastSelectedIndexPath.section;
+  NSUInteger testIndex = self.lastSelectedIndexPath.row + 1;
+  GHTestNode *nextNode = nil;
+  while (!nextNode && sectionIndex < self.dataSource.root.children.count) {
+    GHTestNode *sectionNode = [[[dataSource_ root] children] objectAtIndex:sectionIndex];
+    while (testIndex < sectionNode.children.count) {
+      GHTestNode *testNode = [[sectionNode children] objectAtIndex:testIndex];
+      if (testNode.test.status != GHTestStatusSucceeded) {
+        nextNode = testNode;
+        self.lastSelectedIndexPath = [NSIndexPath indexPathForRow:testIndex inSection:sectionIndex];
+        break;
+      }
+      testIndex++;
+    }
+    testIndex = 0;
+    sectionIndex++;
+  }
+  return nextNode.test;
 }
 
 @end
