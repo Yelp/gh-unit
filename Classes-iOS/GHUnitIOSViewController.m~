@@ -219,7 +219,12 @@ NSString *const GHUnitFilterKey = @"Filter";
     [view_.tableView reloadData];
   } else {    
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+<<<<<<< HEAD
+    GHTestNode *sectionNode = [[dataSource_ root] children][indexPath.section];
+    GHTestNode *testNode = [sectionNode children][indexPath.row];
+=======
     GHTestNode *testNode = [self _testNodeForIndexPath:indexPath];
+>>>>>>> Scroll to paged test
     
     GHUnitIOSTestViewController *testViewController = [[GHUnitIOSTestViewController alloc] init];
     testViewController.delegate = self;
