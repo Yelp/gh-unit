@@ -89,6 +89,11 @@ NSString *const GHUnitFilterKey = @"Filter";
 - (void)viewDidAppear:(BOOL)animated {
   [super viewDidAppear:animated];
   [self reload];
+  if (self.lastSelectedIndexPath) {
+    GHTestNode *testNode = [self _testNodeForIndexPath:self.lastSelectedIndexPath];
+    [self scrollToTest:testNode.test];
+    self.lastSelectedIndexPath = nil;
+  }
 }
 
 - (GHUnitIOSTableViewDataSource *)dataSource {
@@ -189,6 +194,11 @@ NSString *const GHUnitFilterKey = @"Filter";
   view_.statusLabel.text = message;
 }
 
+- (GHTestNode *)_testNodeForIndexPath:(NSIndexPath *)indexPath {
+  GHTestNode *sectionNode = [[[dataSource_ root] children] objectAtIndex:indexPath.section];
+  return [[sectionNode children] objectAtIndex:indexPath.row];
+}
+
 #pragma mark Delegates (UITableView)
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -200,8 +210,7 @@ NSString *const GHUnitFilterKey = @"Filter";
     [view_.tableView reloadData];
   } else {    
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    GHTestNode *sectionNode = [[[dataSource_ root] children] objectAtIndex:indexPath.section];
-    GHTestNode *testNode = [[sectionNode children] objectAtIndex:indexPath.row];
+    GHTestNode *testNode = [self _testNodeForIndexPath:indexPath];
     
     GHUnitIOSTestViewController *testViewController = [[GHUnitIOSTestViewController alloc] init];
     testViewController.delegate = self;
