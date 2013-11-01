@@ -293,6 +293,9 @@
     [[self class] saveFailedViewTestImage:diffImage filename:[imageFilenamePrefix stringByAppendingString:@"-diff.png"]];
     [[self class] saveFailedViewTestImage:newViewImage filename:[imageFilenamePrefix stringByAppendingString:@"-new.png"]];
     [[NSException exceptionWithName:@"GHViewChangeException" reason:@"View has changed" userInfo:exceptionDictionary] raise];
+  } else {
+    // Passing test, forward passing image
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"GHUnitViewTestPass" object:self userInfo:@{@"image": newViewImage}];
   }
   imageVerifyCount_++;
 }

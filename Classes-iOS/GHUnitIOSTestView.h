@@ -48,4 +48,6 @@
 
 - (void)setText:(NSString *)text;
 
+- (void)setPassingImage:(UIImage *)passingImage;
+
 @end

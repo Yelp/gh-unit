@@ -101,9 +101,8 @@
   // Fix text view to sides and bottom of the content view
   [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-10-[_textLabel]-10-|" options:0 metrics:nil views:views]];
   [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_textLabel]-10-|" options:0 metrics:nil views:views]];
-  [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[_savedImageView(145)]-[_renderedImageView(145)]" options:NSLayoutFormatAlignAllTop metrics:nil views:views]];
   [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-10-[_approveButton]-10-|" options:NSLayoutFormatAlignAllTop metrics:nil views:views]];
-
+  [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[_savedImageView]-[_renderedImageView]" options:NSLayoutFormatAlignAllTop metrics:nil views:views]];
 }
 
 - (void)updateConstraints {
@@ -115,17 +114,29 @@
   if (self.savedImageView.hidden && self.renderedImageView.hidden) {
     [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-10-[_textLabel]" options:0 metrics:nil views:views]];
   } else {
-    [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-10-[_approveButton]-10-[_savedImageView]" options:0 metrics:nil views:views]];
+    if (!self.approveButton.hidden) {
+      [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-10-[_approveButton]-10-[_savedImageView]" options:0 metrics:nil views:views]];
+    } else {
+      [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-10-[_savedImageView]" options:0 metrics:nil views:views]];
+    }
     [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_savedImageView]-(>=10)-[_textLabel]" options:NSLayoutFormatAlignAllLeft metrics:nil views:views]];
     [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_renderedImageView]-(>=10)-[_textLabel]" options:0 metrics:nil views:views]];
     
-    CGFloat aspectRatio = self.savedImageView.image.size.height / self.savedImageView.image.size.width;
-    CGFloat height = aspectRatio * 145.0;
-    [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[_savedImageView(%f)]", height] options:0 metrics:nil views:views]];
-
-    aspectRatio = self.renderedImageView.image.size.height / self.renderedImageView.image.size.width;
-    height = aspectRatio * 145.0;
-    [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[_renderedImageView(%f)]", height] options:0 metrics:nil views:views]];
+    if (!self.savedImageView.hidden) {
+      CGFloat width = self.renderedImageView.hidden ? 300.0 : 145.0;
+      CGFloat aspectRatio = self.savedImageView.image.size.height / self.savedImageView.image.size.width;
+      CGFloat height = aspectRatio * width;
+      [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[_savedImageView(%f)]", height] options:0 metrics:nil views:views]];
+      [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"H:[_savedImageView(%f)]", width] options:0 metrics:nil views:views]];
+    }
+    
+    if (!self.renderedImageView.hidden) {
+      CGFloat width = 145.0;
+      CGFloat aspectRatio = self.renderedImageView.image.size.height / self.renderedImageView.image.size.width;
+      CGFloat height = aspectRatio * width;
+      [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[_renderedImageView(%f)]", height] options:0 metrics:nil views:views]];
+      [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"H:[_renderedImageView(%f)]", width] options:0 metrics:nil views:views]];
+    }
   }
   
   [_contentView addConstraints:self.updateableConstraints];
@@ -144,14 +155,12 @@
   [self.controlDelegate testViewDidApproveChange:self];
 }
 
-- (void)setSavedImage:(UIImage *)savedImage text:(NSString *)text {
-}
-
 - (void)setSavedImage:(UIImage *)savedImage renderedImage:(UIImage *)renderedImage text:(NSString *)text {
   self.savedImageView.image = savedImage;
   self.savedImageView.hidden = savedImage ? NO : YES;
+  self.savedImageView.userInteractionEnabled = YES;
   self.renderedImageView.image = renderedImage;
-  self.renderedImageView.hidden = renderedImage ? NO : YES;
+  self.renderedImageView.hidden = NO;
   self.approveButton.hidden = NO;
   self.textLabel.text = text;
   [self setNeedsUpdateConstraints];
@@ -162,6 +171,13 @@
   self.renderedImageView.hidden = YES;
   self.approveButton.hidden = YES;
   self.textLabel.text = text;
+  [self setNeedsUpdateConstraints];
+}
+
+- (void)setPassingImage:(UIImage *)passingImage {
+  self.savedImageView.image = passingImage;
+  self.savedImageView.hidden = NO;
+  self.savedImageView.userInteractionEnabled = NO;
   [self setNeedsUpdateConstraints];
 }
 

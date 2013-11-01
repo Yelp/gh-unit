@@ -89,6 +89,9 @@
     [testView_ setSavedImage:nil renderedImage:renderedImage text:text];
   } else {
     [testView_ setText:text];
+    if (testNode_.test.image) {
+      [testView_ setPassingImage:testNode_.test.image];
+    }
   }
   return text;
 }
