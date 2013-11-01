@@ -45,6 +45,9 @@ NSString *const GHUnitFilterKey = @"Filter";
 - (id)init {
   if ((self = [super init])) {
     self.title = @"Tests";
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+      self.edgesForExtendedLayout = UIRectEdgeNone;
+    }
   }
   return self;
 }
@@ -71,7 +74,7 @@ NSString *const GHUnitFilterKey = @"Filter";
   view_.tableView.delegate = nil;
   view_.searchBar.delegate = nil;
   
-  view_ = [[GHUnitIOSView alloc] initWithFrame:CGRectMake(0, 0, 320, 344)];
+  view_ = [[GHUnitIOSView alloc] init];
   view_.searchBar.delegate = self;
   NSString *textFilter = [self _textFilter];
   if (textFilter) view_.searchBar.text = textFilter;  
