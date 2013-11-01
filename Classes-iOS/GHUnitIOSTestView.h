@@ -42,12 +42,12 @@
 
 @property(unsafe_unretained, nonatomic) id<GHUnitIOSTestViewDelegate> controlDelegate;
 
-- (void)setSavedImage:(UIImage *)savedImage text:(NSString *)text;
-
 - (void)setSavedImage:(UIImage *)savedImage renderedImage:(UIImage *)renderedImage text:(NSString *)text;
 
 - (void)setText:(NSString *)text;
 
 - (void)setPassingImage:(UIImage *)passingImage;
+
+- (void)setPasses:(BOOL)passes;
 
 @end

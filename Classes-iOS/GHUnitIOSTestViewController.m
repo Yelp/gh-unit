@@ -81,6 +81,7 @@
 }
 
 - (NSString *)updateTestView {
+  [testView_ setPasses:testNode_.test.status == GHTestStatusSucceeded];
   NSMutableString *text = [NSMutableString stringWithCapacity:200];
   [text appendFormat:@"%@ %@\n", [testNode_ identifier], [testNode_ statusString]];
   NSString *log = [testNode_ log];

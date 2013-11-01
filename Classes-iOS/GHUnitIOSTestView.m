@@ -38,6 +38,9 @@
 @property (strong, nonatomic) GHUIImageViewControl *renderedImageView;
 @property (strong, nonatomic) UIButton *approveButton;
 @property (strong, nonatomic) UILabel *textLabel;
+@property (strong, nonatomic) UILabel *passLabel;
+@property (strong, nonatomic) NSAttributedString *passString;
+@property (strong, nonatomic) NSAttributedString *failString;
 
 @property (strong, nonatomic) NSMutableArray *updateableConstraints;
 
@@ -52,6 +55,19 @@
     _contentView = [[UIView alloc] init];
     _contentView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_contentView];
+    
+    _passLabel = [[UILabel alloc] init];
+    _passLabel.textAlignment = NSTextAlignmentCenter;
+    _passLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    [_contentView addSubview:_passLabel];
+    _passString = [[NSAttributedString alloc] initWithString:@"PASS" attributes:@{
+                                                                                  NSFontAttributeName: [UIFont boldSystemFontOfSize:20],
+                                                                                  NSForegroundColorAttributeName: [UIColor colorWithRed:0.0 green:0.7 blue:0.0 alpha:1.0]
+                                                                                  }];
+    _failString = [[NSAttributedString alloc] initWithString:@"FAIL" attributes:@{
+                                                                                  NSFontAttributeName: [UIFont boldSystemFontOfSize:20],
+                                                                                  NSForegroundColorAttributeName: [UIColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0]
+                                                                                  }];
     
     _textLabel = [[UILabel alloc] init];
     _textLabel.font = [UIFont systemFontOfSize:12];
@@ -93,31 +109,34 @@
 }
 
 - (void)_installConstraints {
-  NSDictionary *views = NSDictionaryOfVariableBindings(self, _contentView, _textLabel, _savedImageView, _renderedImageView, _approveButton);
+  NSDictionary *views = NSDictionaryOfVariableBindings(self, _contentView, _passLabel, _textLabel, _savedImageView, _renderedImageView, _approveButton);
   
   [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_contentView]|" options:0 metrics:nil views:views]];
   [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_contentView(320)]|" options:0 metrics:nil views:views]];
   
-  // Fix text view to sides and bottom of the content view
+  [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-10-[_passLabel]-10-|" options:0 metrics:nil views:views]];
+  [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-10-[_passLabel]" options:0 metrics:nil views:views]];
+  
   [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-10-[_textLabel]-10-|" options:0 metrics:nil views:views]];
   [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_textLabel]-10-|" options:0 metrics:nil views:views]];
+  
   [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-10-[_approveButton]-10-|" options:NSLayoutFormatAlignAllTop metrics:nil views:views]];
   [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[_savedImageView]-[_renderedImageView]" options:NSLayoutFormatAlignAllTop metrics:nil views:views]];
 }
 
 - (void)updateConstraints {
-  NSDictionary *views = NSDictionaryOfVariableBindings(self, _contentView, _textLabel, _savedImageView, _renderedImageView, _approveButton);
+  NSDictionary *views = NSDictionaryOfVariableBindings(self, _contentView, _passLabel, _textLabel, _savedImageView, _renderedImageView, _approveButton);
   
   [self.contentView removeConstraints:self.updateableConstraints];
   [self.updateableConstraints removeAllObjects];
   
   if (self.savedImageView.hidden && self.renderedImageView.hidden) {
-    [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-10-[_textLabel]" options:0 metrics:nil views:views]];
+    [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_passLabel]-10-[_textLabel]" options:0 metrics:nil views:views]];
   } else {
     if (!self.approveButton.hidden) {
-      [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-10-[_approveButton]-10-[_savedImageView]" options:0 metrics:nil views:views]];
+      [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_passLabel]-10-[_approveButton]-10-[_savedImageView]" options:0 metrics:nil views:views]];
     } else {
-      [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-10-[_savedImageView]" options:0 metrics:nil views:views]];
+      [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_passLabel]-10-[_savedImageView]" options:0 metrics:nil views:views]];
     }
     [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_savedImageView]-(>=10)-[_textLabel]" options:NSLayoutFormatAlignAllLeft metrics:nil views:views]];
     [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_renderedImageView]-(>=10)-[_textLabel]" options:0 metrics:nil views:views]];
@@ -178,6 +197,11 @@
   self.savedImageView.image = passingImage;
   self.savedImageView.hidden = NO;
   self.savedImageView.userInteractionEnabled = NO;
+  [self setNeedsUpdateConstraints];
+}
+
+- (void)setPasses:(BOOL)passes {
+  self.passLabel.attributedText = passes ? self.passString : self.failString;
   [self setNeedsUpdateConstraints];
 }
 
