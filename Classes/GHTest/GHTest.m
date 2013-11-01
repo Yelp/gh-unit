@@ -81,7 +81,7 @@ BOOL GHTestStatusEnded(GHTestStatus status) {
 @implementation GHTest
 
 @synthesize delegate=delegate_, target=target_, selector=selector_, name=name_, interval=interval_, 
-exception=exception_, status=status_, log=log_, identifier=identifier_, disabled=disabled_, hidden=hidden_;
+exception=exception_, status=status_, log=log_, identifier=identifier_, disabled=disabled_, hidden=hidden_, image=image_;
 
 - (id)initWithIdentifier:(NSString *)identifier name:(NSString *)name {
   if ((self = [self init])) {
@@ -131,7 +131,8 @@ exception=exception_, status=status_, log=log_, identifier=identifier_, disabled
 - (void)reset {
   status_ = GHTestStatusNone;
   interval_ = 0;
-  exception_ = nil; 
+  exception_ = nil;
+  image_ = nil;
   [delegate_ testDidUpdate:self source:self];
 }
 
@@ -189,6 +190,10 @@ exception=exception_, status=status_, log=log_, identifier=identifier_, disabled
   }
 }
 
+- (void)_viewTestPassedNotification:(NSNotification *)notification {
+  image_ = notification.userInfo[@"image"];
+}
+
 - (void)run:(GHTestOptions)options {
   if (status_ == GHTestStatusCancelled || disabled_ || hidden_) return;
   
@@ -205,7 +210,9 @@ exception=exception_, status=status_, log=log_, identifier=identifier_, disabled
 
   BOOL reraiseExceptions = ((options & GHTestOptionReraiseExceptions) == GHTestOptionReraiseExceptions);
   NSException *exception = nil;
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_viewTestPassedNotification:) name:@"GHUnitViewTestPass" object:nil];
   [GHTesting runTestWithTarget:target_ selector:selector_ exception:&exception interval:&interval_ reraiseExceptions:reraiseExceptions];
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:@"GHUnitViewTestPass" object:nil];
   exception_ = exception;
   
   [self _setLogWriter:nil];

@@ -28,7 +28,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#import <UIKit/UIKit.h>
 
 /*!
  Test status.
@@ -119,6 +119,11 @@ extern NSString *NSStringFromGHTestStats(GHTestStats stats);
  Test stats.
  */
 @property (readonly, nonatomic) GHTestStats stats;
+
+/*!
+ An image for a passing view test.
+ */
+@property (retain, nonatomic) UIImage *image;
 
 /*!
  Exception that occurred.
