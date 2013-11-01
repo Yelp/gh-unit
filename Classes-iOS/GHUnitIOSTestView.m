@@ -37,6 +37,7 @@
 @property (strong, nonatomic) GHUIImageViewControl *savedImageView;
 @property (strong, nonatomic) GHUIImageViewControl *renderedImageView;
 @property (strong, nonatomic) UIButton *approveButton;
+@property (strong, nonatomic) UIButton *runButton;
 @property (strong, nonatomic) UILabel *textLabel;
 @property (strong, nonatomic) UILabel *passLabel;
 @property (strong, nonatomic) NSAttributedString *passString;
@@ -101,6 +102,14 @@
     _approveButton.translatesAutoresizingMaskIntoConstraints = NO;
     [_contentView addSubview:_approveButton];
     
+    _runButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    [_runButton addTarget:self action:@selector(_runTest) forControlEvents:UIControlEventTouchUpInside];
+    [_runButton setTitle:@"Re-run" forState:UIControlStateNormal];
+    [_runButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    _runButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:18];
+    _runButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [_contentView addSubview:_runButton];
+    
     _updateableConstraints = [[NSMutableArray alloc] init];
     
     [self _installConstraints];
@@ -109,13 +118,13 @@
 }
 
 - (void)_installConstraints {
-  NSDictionary *views = NSDictionaryOfVariableBindings(self, _contentView, _passLabel, _textLabel, _savedImageView, _renderedImageView, _approveButton);
+  NSDictionary *views = NSDictionaryOfVariableBindings(self, _contentView, _runButton, _passLabel, _textLabel, _savedImageView, _renderedImageView, _approveButton);
   
   [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_contentView]|" options:0 metrics:nil views:views]];
   [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_contentView(320)]|" options:0 metrics:nil views:views]];
   
-  [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-10-[_passLabel]-10-|" options:0 metrics:nil views:views]];
-  [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-10-[_passLabel]" options:0 metrics:nil views:views]];
+  [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-10-[_passLabel]-[_runButton]-10-|" options:NSLayoutFormatAlignAllTop metrics:nil views:views]];
+  [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-10-[_passLabel(==_runButton)]" options:0 metrics:nil views:views]];
   
   [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-10-[_textLabel]-10-|" options:0 metrics:nil views:views]];
   [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_textLabel]-10-|" options:0 metrics:nil views:views]];
@@ -172,6 +181,10 @@
 
 - (void)_approveChange {
   [self.controlDelegate testViewDidApproveChange:self];
+}
+
+- (void)_runTest {
+  [self.controlDelegate testViewDidRunTest:self];
 }
 
 - (void)setSavedImage:(UIImage *)savedImage renderedImage:(UIImage *)renderedImage text:(NSString *)text {
