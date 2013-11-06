@@ -274,7 +274,8 @@
                                    imageVerifyCount_,
                                    NSStringFromClass([view class])];
   NSString *imageFilename = [imageFilenamePrefix stringByAppendingString:@".png"];
-  UIImage *originalViewImage = [[self class] readSavedTestImageWithFilename:imageFilename];
+  NSString *systemVersion = [[UIDevice currentDevice] systemVersion];
+  UIImage *originalViewImage = [[self class] readSavedTestImageWithFilename:[systemVersion stringByAppendingPathComponent:imageFilename]];
   UIImage *newViewImage = [[self class] imageWithView:view];
   NSMutableDictionary *exceptionDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                               newViewImage, @"RenderedImage",
