@@ -87,7 +87,7 @@
   [self saveImage:image filePath:filePath];
 }
 
-+ (UIImage *)readSavedTestImageWithFilename:(NSString *)filename {
++ (UIImage *)readSavedTestImageWithFilename:(NSString *)filename systemVersion:(NSString *)systemVersion {
   NSString *filePath = [self approvedTestImagePathForFilename:filename];
   GHUDebug(@"Trying to load image at path %@", filePath);
   // First look in the documents directory for the image
@@ -96,6 +96,8 @@
   if (image) GHUDebug(@"Found image in documents directory");
   if (!image) {
     NSString* extension = [filename pathExtension];
+    // Bundle images are organized by system version subdirectories
+    filename = [systemVersion stringByAppendingPathComponent:filename];
     filePath = [[NSBundle mainBundle] pathForResource:[filename stringByDeletingPathExtension] ofType:extension];
     image = [GHViewTestCase _imageFromFilePath:filePath];
     if (image) GHUDebug(@"Found image in app bundle");
@@ -276,7 +278,6 @@
   NSString *imageFilename = [imageFilenamePrefix stringByAppendingString:@".png"];
   NSString *systemVersion = [[UIDevice currentDevice] systemVersion];
   UIImage *originalViewImage = [[self class] readSavedTestImageWithFilename:imageFilename systemVersion:systemVersion];
-                                //readSavedTestImageWithFilename:[systemVersion stringByAppendingPathComponent:imageFilename]];
   UIImage *newViewImage = [[self class] imageWithView:view];
   NSMutableDictionary *exceptionDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                               newViewImage, @"RenderedImage",
