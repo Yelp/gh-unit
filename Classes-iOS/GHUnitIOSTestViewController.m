@@ -34,6 +34,9 @@
 
 - (id)init {
   if ((self = [super init])) {
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0) {
+      self.edgesForExtendedLayout = UIRectEdgeNone;
+    }
     UIBarButtonItem *nextButton = [[UIBarButtonItem alloc] initWithTitle:@"Next" style:UIBarButtonItemStyleDone target:self action:@selector(_loadNextFailingTest)];
     self.navigationItem.rightBarButtonItem = nextButton;
   }
