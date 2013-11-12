@@ -30,18 +30,29 @@
 #import "GHUnitIOSTestView.h"
 #import <QuartzCore/QuartzCore.h>
 
+static const CGFloat kOverlayViewVerticalMargin = 10.0;
+
+@interface GHUnitIOSTestOverlayView : UIView
+
+@property (strong, nonatomic) UIButton *runButton;
+@property (strong, nonatomic) UILabel *passLabel;
+@property (strong, nonatomic) NSAttributedString *passString;
+@property (strong, nonatomic) NSAttributedString *failString;
+
+- (void)setPasses:(BOOL)passes;
+
+@end
+
+
 @interface GHUnitIOSTestView ()
 
-// TODO(johnb): Perhaps hold a scrollview here as subclassing UIViews can be weird.
+@property (strong, nonatomic) UIScrollView *scrollView;
+@property (strong, nonatomic) GHUnitIOSTestOverlayView *overlayView;
 @property (strong, nonatomic) UIView *contentView;
 @property (strong, nonatomic) GHUIImageViewControl *savedImageView;
 @property (strong, nonatomic) GHUIImageViewControl *renderedImageView;
 @property (strong, nonatomic) UIButton *approveButton;
-@property (strong, nonatomic) UIButton *runButton;
 @property (strong, nonatomic) UILabel *textLabel;
-@property (strong, nonatomic) UILabel *passLabel;
-@property (strong, nonatomic) NSAttributedString *passString;
-@property (strong, nonatomic) NSAttributedString *failString;
 
 @property (strong, nonatomic) NSMutableArray *updateableConstraints;
 
@@ -53,22 +64,18 @@
   if ((self = [super initWithFrame:frame])) {
     self.backgroundColor = [UIColor whiteColor];
     
+    _scrollView = [[UIScrollView alloc] init];
+    _scrollView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:_scrollView];
+    
+    _overlayView = [[GHUnitIOSTestOverlayView alloc] init];
+    [_overlayView.runButton addTarget:self action:@selector(_runTest) forControlEvents:UIControlEventTouchUpInside];
+    _overlayView.translatesAutoresizingMaskIntoConstraints = NO;
+    [_scrollView addSubview:_overlayView];
+    
     _contentView = [[UIView alloc] init];
     _contentView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addSubview:_contentView];
-    
-    _passLabel = [[UILabel alloc] init];
-    _passLabel.textAlignment = NSTextAlignmentCenter;
-    _passLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    [_contentView addSubview:_passLabel];
-    _passString = [[NSAttributedString alloc] initWithString:@"PASS" attributes:@{
-                                                                                  NSFontAttributeName: [UIFont boldSystemFontOfSize:20],
-                                                                                  NSForegroundColorAttributeName: [UIColor colorWithRed:0.0 green:0.7 blue:0.0 alpha:1.0]
-                                                                                  }];
-    _failString = [[NSAttributedString alloc] initWithString:@"FAIL" attributes:@{
-                                                                                  NSFontAttributeName: [UIFont boldSystemFontOfSize:20],
-                                                                                  NSForegroundColorAttributeName: [UIColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0]
-                                                                                  }];
+    [_scrollView addSubview:_contentView];
     
     _textLabel = [[UILabel alloc] init];
     _textLabel.font = [UIFont systemFontOfSize:12];
@@ -93,38 +100,38 @@
     _renderedImageView.translatesAutoresizingMaskIntoConstraints = NO;
     [_contentView addSubview:_renderedImageView];
     
-    _approveButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    _approveButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_approveButton addTarget:self action:@selector(_approveChange) forControlEvents:UIControlEventTouchUpInside];
     _approveButton.hidden = YES;
     [_approveButton setTitle:@"Approve this change" forState:UIControlStateNormal];
-    [_approveButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     _approveButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:18];
     _approveButton.translatesAutoresizingMaskIntoConstraints = NO;
     [_contentView addSubview:_approveButton];
     
-    _runButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    [_runButton addTarget:self action:@selector(_runTest) forControlEvents:UIControlEventTouchUpInside];
-    [_runButton setTitle:@"Re-run" forState:UIControlStateNormal];
-    [_runButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    _runButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:18];
-    _runButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [_contentView addSubview:_runButton];
-    
     _updateableConstraints = [[NSMutableArray alloc] init];
-    
     [self _installConstraints];
+    
+    [_scrollView bringSubviewToFront:_overlayView];
   }
   return self;
 }
 
 - (void)_installConstraints {
-  NSDictionary *views = NSDictionaryOfVariableBindings(self, _contentView, _runButton, _passLabel, _textLabel, _savedImageView, _renderedImageView, _approveButton);
+  NSDictionary *views = NSDictionaryOfVariableBindings(self, _overlayView, _scrollView, _contentView, _textLabel, _savedImageView, _renderedImageView, _approveButton);
   
-  [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_contentView]|" options:0 metrics:nil views:views]];
-  [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_contentView(320)]|" options:0 metrics:nil views:views]];
+  [self addConstraint:[NSLayoutConstraint constraintWithItem:_overlayView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0]];
+  [self addConstraint:[NSLayoutConstraint constraintWithItem:_overlayView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0.0]];
+  [self addConstraint:[NSLayoutConstraint constraintWithItem:_overlayView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeWidth multiplier:1.0 constant:0.0]];
   
-  [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-10-[_passLabel]-[_runButton]-10-|" options:NSLayoutFormatAlignAllTop metrics:nil views:views]];
-  [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-10-[_passLabel(==_runButton)]" options:0 metrics:nil views:views]];
+  [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_scrollView]|" options:0 metrics:nil views:views]];
+  [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_scrollView]|" options:0 metrics:nil views:views]];
+  
+  [_scrollView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(overlayHeight)-[_contentView]|" options:0
+                                                                      metrics:@{
+                                                                                @"overlayHeight": @([_overlayView intrinsicContentSize].height)
+                                                                                }
+                                                                        views:views]];
+  [_scrollView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_contentView(320)]|" options:0 metrics:nil views:views]];
   
   [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-10-[_textLabel]-10-|" options:0 metrics:nil views:views]];
   [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_textLabel]-10-|" options:0 metrics:nil views:views]];
@@ -134,18 +141,18 @@
 }
 
 - (void)updateConstraints {
-  NSDictionary *views = NSDictionaryOfVariableBindings(self, _contentView, _passLabel, _textLabel, _savedImageView, _renderedImageView, _approveButton);
+  NSDictionary *views = NSDictionaryOfVariableBindings(self, _contentView, _textLabel, _savedImageView, _renderedImageView, _approveButton);
   
   [self.contentView removeConstraints:self.updateableConstraints];
   [self.updateableConstraints removeAllObjects];
   
   if (self.savedImageView.hidden && self.renderedImageView.hidden) {
-    [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_passLabel]-10-[_textLabel]" options:0 metrics:nil views:views]];
+    [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_textLabel]" options:0 metrics:nil views:views]];
   } else {
     if (!self.approveButton.hidden) {
-      [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_passLabel]-10-[_approveButton]-10-[_savedImageView]" options:0 metrics:nil views:views]];
+      [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_approveButton]-10-[_savedImageView]" options:0 metrics:nil views:views]];
     } else {
-      [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_passLabel]-10-[_savedImageView]" options:0 metrics:nil views:views]];
+      [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_savedImageView]" options:0 metrics:nil views:views]];
     }
     [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_savedImageView]-(>=10)-[_textLabel]" options:NSLayoutFormatAlignAllLeft metrics:nil views:views]];
     [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_renderedImageView]-(>=10)-[_textLabel]" options:0 metrics:nil views:views]];
@@ -214,8 +221,59 @@
 }
 
 - (void)setPasses:(BOOL)passes {
+  [self.overlayView setPasses:passes];
+}
+
+@end
+
+
+@implementation GHUnitIOSTestOverlayView
+
+- (instancetype)initWithFrame:(CGRect)frame {
+  if ((self = [super initWithFrame:frame])) {
+    self.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.7];
+    
+    _passLabel = [[UILabel alloc] init];
+    _passLabel.textAlignment = NSTextAlignmentCenter;
+    _passLabel.backgroundColor = [UIColor clearColor];
+    _passLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:_passLabel];
+    _passString = [[NSAttributedString alloc] initWithString:@"PASS" attributes:@{
+                                                                                  NSFontAttributeName: [UIFont boldSystemFontOfSize:20],
+                                                                                  NSForegroundColorAttributeName: [UIColor colorWithRed:0.0 green:0.7 blue:0.0 alpha:1.0]
+                                                                                  }];
+    _failString = [[NSAttributedString alloc] initWithString:@"FAIL" attributes:@{
+                                                                                  NSFontAttributeName: [UIFont boldSystemFontOfSize:20],
+                                                                                  NSForegroundColorAttributeName: [UIColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0]
+                                                                                  }];
+    _runButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [_runButton setTitle:@"Re-run" forState:UIControlStateNormal];
+    _runButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:18];
+    _runButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:_runButton];
+    
+    [self _installConstraints];
+  }
+  return self;
+}
+
+- (void)_installConstraints {
+  NSDictionary *views = NSDictionaryOfVariableBindings(_passLabel, _runButton);
+  [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-10-[_passLabel]-[_runButton]-10-|" options:NSLayoutFormatAlignAllTop metrics:nil views:views]];
+  [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-verticalMargin-[_passLabel(==_runButton)]-verticalMargin-|"
+                                                               options:0
+                                                               metrics:@{
+                                                                         @"verticalMargin": @(kOverlayViewVerticalMargin)
+                                                                         }
+                                                                 views:views]];
+}
+
+- (CGSize)intrinsicContentSize {
+  return CGSizeMake(UIViewNoIntrinsicMetric, _runButton.intrinsicContentSize.height + kOverlayViewVerticalMargin*2);
+}
+
+- (void)setPasses:(BOOL)passes {
   self.passLabel.attributedText = passes ? self.passString : self.failString;
-  [self setNeedsUpdateConstraints];
 }
 
 @end

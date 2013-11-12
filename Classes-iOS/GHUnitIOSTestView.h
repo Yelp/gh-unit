@@ -39,7 +39,7 @@
 - (void)testViewDidRunTest:(GHUnitIOSTestView *)testView;
 @end
 
-@interface GHUnitIOSTestView : UIScrollView
+@interface GHUnitIOSTestView : UIView
 
 @property(unsafe_unretained, nonatomic) id<GHUnitIOSTestViewDelegate> controlDelegate;
 
