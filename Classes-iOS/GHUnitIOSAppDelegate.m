@@ -55,7 +55,6 @@
   GHUnitIOSViewController *viewController = [[GHUnitIOSViewController alloc] init];
   [viewController loadDefaults];
   navigationController_ = [[UINavigationController alloc] initWithRootViewController:viewController];
-//  navigationController_.navigationBarHidden = YES;
   window_ = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
   window_.rootViewController = navigationController_;
   [window_ makeKeyAndVisible];
