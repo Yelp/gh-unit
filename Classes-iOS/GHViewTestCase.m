@@ -96,8 +96,10 @@
   if (image) GHUDebug(@"Found image in documents directory");
   if (!image) {
     NSString* extension = [filename pathExtension];
-    // Bundle images are organized by system version subdirectories
-    filename = [systemVersion stringByAppendingPathComponent:filename];
+    // Bundle images are organized by major version number subdirectories
+    NSRange dotRange = [systemVersion rangeOfString:@"."];
+    NSString *majorVersion = [systemVersion substringToIndex:dotRange.location];
+    filename = [majorVersion stringByAppendingPathComponent:filename];
     filePath = [[NSBundle mainBundle] pathForResource:[filename stringByDeletingPathExtension] ofType:extension];
     image = [GHViewTestCase _imageFromFilePath:filePath];
     if (image) GHUDebug(@"Found image in app bundle");
