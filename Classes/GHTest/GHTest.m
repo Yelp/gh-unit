@@ -35,6 +35,8 @@
 #import "GHTesting.h"
 #import "GHTestCase.h"
 
+NSString *const GHUnitViewTestPassNotificiation = @"GHUnitViewTestPassNotificiation";
+
 @interface GHTest ()
 - (void)_setLogWriter:(id<GHTestCaseLogWriter>)logWriter;
 @end
@@ -210,9 +212,9 @@ exception=exception_, status=status_, log=log_, identifier=identifier_, disabled
 
   BOOL reraiseExceptions = ((options & GHTestOptionReraiseExceptions) == GHTestOptionReraiseExceptions);
   NSException *exception = nil;
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_viewTestPassedNotification:) name:@"GHUnitViewTestPass" object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_viewTestPassedNotification:) name:GHUnitViewTestPassNotificiation object:nil];
   [GHTesting runTestWithTarget:target_ selector:selector_ exception:&exception interval:&interval_ reraiseExceptions:reraiseExceptions];
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:@"GHUnitViewTestPass" object:nil];
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:GHUnitViewTestPassNotificiation object:nil];
   exception_ = exception;
   
   [self _setLogWriter:nil];

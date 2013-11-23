@@ -300,7 +300,7 @@
     [[NSException exceptionWithName:@"GHViewChangeException" reason:@"View has changed" userInfo:exceptionDictionary] raise];
   } else {
     // Passing test, forward passing image
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"GHUnitViewTestPass" object:self userInfo:@{@"image": newViewImage}];
+    [[NSNotificationCenter defaultCenter] postNotificationName:GHUnitViewTestPassNotificiation object:self userInfo:@{@"image": newViewImage}];
   }
   imageVerifyCount_++;
 }

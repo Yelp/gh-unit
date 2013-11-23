@@ -204,8 +204,8 @@ NSString *const GHUnitFilterKey = @"Filter";
 }
 
 - (GHTestNode *)_testNodeForIndexPath:(NSIndexPath *)indexPath {
-  GHTestNode *sectionNode = [[[dataSource_ root] children] objectAtIndex:indexPath.section];
-  return [[sectionNode children] objectAtIndex:indexPath.row];
+  GHTestNode *sectionNode = [[dataSource_ root] children][indexPath.section];
+  return [sectionNode children][indexPath.row];
 }
 
 #pragma mark Delegates (UITableView)

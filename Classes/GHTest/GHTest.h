@@ -31,6 +31,11 @@
 #import <UIKit/UIKit.h>
 
 /*!
+ Notification name that a view test passed.
+ */
+extern NSString *const GHUnitViewTestPassNotificiation;
+
+/*!
  Test status.
  */
 typedef enum {
