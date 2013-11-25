@@ -119,24 +119,40 @@ static const CGFloat kOverlayViewVerticalMargin = 10.0;
 - (void)_installConstraints {
   NSDictionary *views = NSDictionaryOfVariableBindings(self, _overlayView, _scrollView, _contentView, _textLabel, _savedImageView, _renderedImageView, _approveButton);
   
-  [self addConstraint:[NSLayoutConstraint constraintWithItem:_overlayView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0]];
-  [self addConstraint:[NSLayoutConstraint constraintWithItem:_overlayView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0.0]];
-  [self addConstraint:[NSLayoutConstraint constraintWithItem:_overlayView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeWidth multiplier:1.0 constant:0.0]];
+  // Pin the overlay view to self so that it doesn't scroll with the scroll view
+  NSMutableArray *overlayViewConstraints = @[
+                                             [NSLayoutConstraint constraintWithItem:_overlayView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0],
+                                             [NSLayoutConstraint constraintWithItem:_overlayView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0.0],
+                                             [NSLayoutConstraint constraintWithItem:_overlayView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeWidth multiplier:1.0 constant:0.0]
+                                             ];
+  [self addConstraints:overlayViewConstraints];
   
-  [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_scrollView]|" options:0 metrics:nil views:views]];
-  [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_scrollView]|" options:0 metrics:nil views:views]];
+  // Fill up self with the scroll view
+  NSMutableArray *scrollViewConstraints = [NSMutableArray array];
+  [scrollViewConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_scrollView]|" options:0 metrics:nil views:views]];
+  [scrollViewConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_scrollView]|" options:0 metrics:nil views:views]];
+  [self addConstraints:scrollViewConstraints];
   
-  [_scrollView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(overlayHeight)-[_contentView]|" options:0
-                                                                      metrics:@{
-                                                                                @"overlayHeight": @([_overlayView intrinsicContentSize].height)
-                                                                                }
-                                                                        views:views]];
-  [_scrollView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_contentView(320)]|" options:0 metrics:nil views:views]];
+  // Pin the content view to the scrollview, leaving space for the overlay view, and set the width of the content view
+  NSMutableArray *contentViewConstraints = [NSMutableArray array];
+  [contentViewConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(overlayHeight)-[_contentView]|" options:0
+                                                                                     metrics:@{
+                                                                                               @"overlayHeight": @([_overlayView intrinsicContentSize].height)
+                                                                                               }
+                                                                                        views:views]];
+  [contentViewConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_contentView(320)]|" options:0 metrics:nil views:views]];
+  [_scrollView addConstraints:contentViewConstraints];
   
-  [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-10-[_textLabel]-10-|" options:0 metrics:nil views:views]];
-  [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_textLabel]-10-|" options:0 metrics:nil views:views]];
+  // Pin the text label to the bottom of the content view
+  NSMutableArray *textLabelConstraints = [NSMutableArray array];
+  [textLabelConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-10-[_textLabel]-10-|" options:0 metrics:nil views:views]];
+  [textLabelConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_textLabel]-10-|" options:0 metrics:nil views:views]];
+  [_contentView addConstraints:textLabelConstraints];
   
+  // Pin the approve button horizontally over the content view
   [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-10-[_approveButton]-10-|" options:NSLayoutFormatAlignAllTop metrics:nil views:views]];
+  
+  // Pin the saved image view to the left of the rendered image view inside the content view, top align them
   [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[_savedImageView]-[_renderedImageView]" options:NSLayoutFormatAlignAllTop metrics:nil views:views]];
 }
 
@@ -147,16 +163,22 @@ static const CGFloat kOverlayViewVerticalMargin = 10.0;
   [self.updateableConstraints removeAllObjects];
   
   if (self.savedImageView.hidden && self.renderedImageView.hidden) {
+    // No images to show, the text label goes at the top
     [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_textLabel]" options:0 metrics:nil views:views]];
   } else {
-    if (!self.approveButton.hidden) {
-      [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_approveButton]-10-[_savedImageView]" options:0 metrics:nil views:views]];
-    } else {
+    if (self.approveButton.hidden) {
+      // Approve button hidden, so the image views get pinned to the top
       [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_savedImageView]" options:0 metrics:nil views:views]];
+    } else {
+      // The approve button is showing so it's on top, then the image views
+      [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_approveButton]-10-[_savedImageView]" options:0 metrics:nil views:views]];
     }
+    
+    // Ensure the text label is spaced away from the larger of the two image views
     [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_savedImageView]-(>=10)-[_textLabel]" options:NSLayoutFormatAlignAllLeft metrics:nil views:views]];
     [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_renderedImageView]-(>=10)-[_textLabel]" options:0 metrics:nil views:views]];
     
+    // Size the image views based on the image aspect ratio - if there is only a saved image view showing (passed test) render it full width of the content view
     if (!self.savedImageView.hidden) {
       CGFloat width = self.renderedImageView.hidden ? 300.0 : 145.0;
       CGFloat aspectRatio = self.savedImageView.image.size.height / self.savedImageView.image.size.width;

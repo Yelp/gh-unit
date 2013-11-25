@@ -204,8 +204,8 @@ NSString *const GHUnitFilterKey = @"Filter";
 }
 
 - (GHTestNode *)_testNodeForIndexPath:(NSIndexPath *)indexPath {
-  GHTestNode *sectionNode = [[dataSource_ root] children][indexPath.section];
-  return [sectionNode children][indexPath.row];
+  GHTestNode *sectionNode = self.dataSource.root.children[indexPath.section];
+  return sectionNode.children[indexPath.row];
 }
 
 #pragma mark Delegates (UITableView)
@@ -337,9 +337,9 @@ NSString *const GHUnitFilterKey = @"Filter";
   NSUInteger testIndex = self.lastSelectedIndexPath.row + 1;
   GHTestNode *nextNode = nil;
   while (!nextNode && sectionIndex < self.dataSource.root.children.count) {
-    GHTestNode *sectionNode = [[[dataSource_ root] children] objectAtIndex:sectionIndex];
+    GHTestNode *sectionNode = self.dataSource.root.children[sectionIndex];
     while (testIndex < sectionNode.children.count) {
-      GHTestNode *testNode = [[sectionNode children] objectAtIndex:testIndex];
+      GHTestNode *testNode = sectionNode.children[testIndex];
       if (testNode.test.status != GHTestStatusSucceeded) {
         nextNode = testNode;
         self.lastSelectedIndexPath = [NSIndexPath indexPathForRow:testIndex inSection:sectionIndex];
