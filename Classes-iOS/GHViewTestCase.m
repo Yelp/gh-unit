@@ -96,7 +96,8 @@
   if (image) GHUDebug(@"Found image in documents directory");
   if (!image) {
     NSString* extension = [filename pathExtension];
-    // Bundle images are organized by major version number subdirectories
+    // Test images are bundled in subdirectories based on the iOS major version number
+    //   Example:  running iOS 7.1  ->  7/testimage.png
     NSRange dotRange = [systemVersion rangeOfString:@"."];
     NSString *majorVersion = [systemVersion substringToIndex:dotRange.location];
     filename = [majorVersion stringByAppendingPathComponent:filename];
