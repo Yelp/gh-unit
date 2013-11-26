@@ -282,7 +282,7 @@
   UIImage *originalViewImage = [[self class] readSavedTestImageWithFilename:imageFilename systemVersion:systemVersion];
   UIImage *newViewImage = [[self class] imageWithView:view];
   NSMutableDictionary *exceptionDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                              newViewImage, @"RenderedImage",
+                                              newViewImage, GHUnitRenderedImageKey,
                                               imageFilename, @"ImageFilename",
                                               @(lineNumber), GHTestLineNumberKey,
                                               filename, GHTestFilenameKey,
@@ -292,15 +292,15 @@
     [[NSException exceptionWithName:@"GHViewUnavailableException" reason:@"No image saved for view" userInfo:exceptionDictionary] raise];
   } else if (![[self class] compareImage:originalViewImage withRenderedImage:newViewImage]) {
     UIImage *diffImage = [[self class] diffWithImage:originalViewImage renderedImage:newViewImage];
-    if (diffImage) exceptionDictionary[@"DiffImage"] = diffImage;
-    if (originalViewImage) exceptionDictionary[@"SavedImage"] = originalViewImage;
+    if (diffImage) exceptionDictionary[GHUnitDiffImageKey] = diffImage;
+    if (originalViewImage) exceptionDictionary[GHUnitSavedImageKey] = originalViewImage;
     // Save new and diff images
     [[self class] saveFailedViewTestImage:diffImage filename:[imageFilenamePrefix stringByAppendingString:@"-diff.png"]];
     [[self class] saveFailedViewTestImage:newViewImage filename:[imageFilenamePrefix stringByAppendingString:@"-new.png"]];
     [[NSException exceptionWithName:@"GHViewChangeException" reason:@"View has changed" userInfo:exceptionDictionary] raise];
   } else {
     // Passing test, forward passing image
-    [[NSNotificationCenter defaultCenter] postNotificationName:GHUnitViewTestPassNotificiation object:self userInfo:@{@"image": newViewImage}];
+    [[NSNotificationCenter defaultCenter] postNotificationName:GHUnitViewTestPassNotificiation object:self userInfo:@{GHUnitRenderedImageKey: newViewImage}];
   }
   imageVerifyCount_++;
 }

@@ -150,7 +150,7 @@ static const CGFloat kOverlayViewVerticalMargin = 10.0;
   [_contentView addConstraints:textLabelConstraints];
   
   // Pin the approve button horizontally over the content view
-  [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-10-[_approveButton]-10-|" options:NSLayoutFormatAlignAllTop metrics:nil views:views]];
+  [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-10-[_approveButton]-10-|" options:0 metrics:nil views:views]];
   
   // Pin the saved image view to the left of the rendered image view inside the content view, top align them
   [_contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[_savedImageView]-[_renderedImageView]" options:NSLayoutFormatAlignAllTop metrics:nil views:views]];
@@ -183,16 +183,16 @@ static const CGFloat kOverlayViewVerticalMargin = 10.0;
       CGFloat width = self.renderedImageView.hidden ? 300.0 : 145.0;
       CGFloat aspectRatio = self.savedImageView.image.size.height / self.savedImageView.image.size.width;
       CGFloat height = aspectRatio * width;
-      [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[_savedImageView(%f)]", height] options:0 metrics:nil views:views]];
-      [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"H:[_savedImageView(%f)]", width] options:0 metrics:nil views:views]];
+      [self.updateableConstraints addObject:[NSLayoutConstraint constraintWithItem:self.savedImageView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:0.0 constant:height]];
+      [self.updateableConstraints addObject:[NSLayoutConstraint constraintWithItem:self.savedImageView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:0.0 constant:width]];
     }
     
     if (!self.renderedImageView.hidden) {
       CGFloat width = 145.0;
       CGFloat aspectRatio = self.renderedImageView.image.size.height / self.renderedImageView.image.size.width;
       CGFloat height = aspectRatio * width;
-      [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[_renderedImageView(%f)]", height] options:0 metrics:nil views:views]];
-      [self.updateableConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"H:[_renderedImageView(%f)]", width] options:0 metrics:nil views:views]];
+      [self.updateableConstraints addObject:[NSLayoutConstraint constraintWithItem:self.renderedImageView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:0.0 constant:height]];
+      [self.updateableConstraints addObject:[NSLayoutConstraint constraintWithItem:self.renderedImageView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:0.0 constant:width]];
     }
   }
   

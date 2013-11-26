@@ -31,6 +31,13 @@
 #import <UIKit/UIKit.h>
 
 /*!
+ Keys for image types for notification or exception dictionary.
+ */
+extern NSString *const GHUnitRenderedImageKey;
+extern NSString *const GHUnitSavedImageKey;
+extern NSString *const GHUnitDiffImageKey;
+
+/*!
  Notification name that a view test passed.
  */
 extern NSString *const GHUnitViewTestPassNotificiation;

@@ -35,6 +35,10 @@
 #import "GHTesting.h"
 #import "GHTestCase.h"
 
+NSString *const GHUnitRenderedImageKey = @"GHUnitRenderedImageKey";
+NSString *const GHUnitSavedImageKey = @"GHUnitSavedImageKey";
+NSString *const GHUnitDiffImageKey = @"GHUnitDiffImageKey";
+
 NSString *const GHUnitViewTestPassNotificiation = @"GHUnitViewTestPassNotificiation";
 
 @interface GHTest ()
@@ -193,7 +197,7 @@ exception=exception_, status=status_, log=log_, identifier=identifier_, disabled
 }
 
 - (void)_viewTestPassedNotification:(NSNotification *)notification {
-  image_ = notification.userInfo[@"image"];
+  image_ = notification.userInfo[GHUnitRenderedImageKey];
 }
 
 - (void)run:(GHTestOptions)options {
