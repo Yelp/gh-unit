@@ -115,11 +115,18 @@ typedef enum {
 }
 
 - (void)waitForStatus:(NSInteger)status timeout:(NSTimeInterval)timeout {
-  GHUnitAsyncError error = [self _waitFor:status timeout:timeout];    
+  [self waitForStatus:status timeout:timeout timeoutBlock:NULL];
+}
+
+- (void)waitForStatus:(NSInteger)status timeout:(NSTimeInterval)timeout timeoutBlock:(GHAsyncTestCaseTimeoutBlock)timeoutBlock {
+  GHUnitAsyncError error = [self _waitFor:status timeout:timeout];
   if (error == kGHUnitAsyncErrorTimedOut) {
+    if (timeoutBlock) {
+      timeoutBlock();
+    }
     GHFail(@"Request timed out");
   } else if (error == kGHUnitAsyncErrorInvalidStatus) {
-    GHFail(@"Request finished with the wrong status: %d != %d", status, notifiedStatus_); 
+    GHFail(@"Request finished with the wrong status: %d != %d", status, notifiedStatus_);
   } else if (error == kGHUnitAsyncErrorUnprepared) {
     GHFail(@"Call prepare before calling asynchronous method and waitForStatus:timeout:");
   }

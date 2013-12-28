@@ -39,6 +39,8 @@ enum {
   kGHUnitWaitStatusCancelled // Wait status cancelled
 };
 
+typedef void(^GHAsyncTestCaseTimeoutBlock);
+
 /*!
  Asynchronous test case with wait and notify.
  
@@ -121,6 +123,17 @@ enum {
  @param timeout Timeout in seconds
  */
 - (void)waitForStatus:(NSInteger)status timeout:(NSTimeInterval)timeout;
+
+/*!
+ @abstract This method behaves the same way as waitForStatus:timeout: with the
+ addition of calling the timeoutBlock upon timeout
+ @param status kGHUnitWaitStatusSuccess, kGHUnitWaitStatusFailure or custom status
+ @param timeout Timeout in seconds
+ @param timeoutBlock GHAsyncTestCaseTimeoutBlock, which is called only if the timeout is reached
+ @discussion This method is useful for performing test specific cleanup that might be
+ impractical to do during tearDown.
+ */
+- (void)waitForStatus:(NSInteger)status timeout:(NSTimeInterval)timeout timeoutBlock:(GHAsyncTestCaseTimeoutBlock)timeoutBlock;
 
 /*! 
  @param status kGHUnitWaitStatusSuccess, kGHUnitWaitStatusFailure or custom status 
