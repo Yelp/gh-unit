@@ -105,6 +105,7 @@ operationQueue=operationQueue_;
   if (inParallel) {
     NSOperationQueue *operationQueue = [[NSOperationQueue alloc] init];
     operationQueue.maxConcurrentOperationCount = NSOperationQueueDefaultMaxConcurrentOperationCount;
+    operationQueue.name = @"com.GHUnit.GHTestRunner.GHTestOperationQueue";
     self.operationQueue = operationQueue;
   } else {
     self.operationQueue = nil;
