@@ -39,7 +39,7 @@ enum {
   kGHUnitWaitStatusCancelled // Wait status cancelled
 };
 
-typedef void(^GHAsyncTestCaseTimeoutBlock);
+typedef void(^GHAsyncTestCaseTimeoutBlock)();
 
 /*!
  Asynchronous test case with wait and notify.
