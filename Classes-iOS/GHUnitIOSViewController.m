@@ -90,10 +90,14 @@ NSString *const GHUnitFilterKey = @"Filter";
   [super viewDidAppear:animated];
   [self reload];
   if (self.lastSelectedIndexPath) {
-    GHTestNode *testNode = [self _testNodeForIndexPath:self.lastSelectedIndexPath];
-    [self scrollToTest:testNode.test];
-    self.lastSelectedIndexPath = nil;
+    NSInteger section = MIN(self.lastSelectedIndexPath.section, self.dataSource.root.children.count - 1);
+    GHTestNode *sectionNode = self.dataSource.root.children[section];
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:MIN(self.lastSelectedIndexPath.row, sectionNode.children.count - 1) inSection:section];
+    if (![[view_.tableView indexPathsForVisibleRows] containsObject:indexPath]) {
+      [view_.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
+    }
   }
+  self.lastSelectedIndexPath = nil;
 }
 
 - (GHUnitIOSTableViewDataSource *)dataSource {
