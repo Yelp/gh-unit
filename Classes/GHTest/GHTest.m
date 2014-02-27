@@ -70,8 +70,8 @@ GHTestStats GHTestStatsMake(NSInteger succeedCount, NSInteger failureCount, NSIn
 const GHTestStats GHTestStatsEmpty = {0, 0, 0, 0};
 
 NSString *NSStringFromGHTestStats(GHTestStats stats) {
-  return [NSString stringWithFormat:@"%d/%d/%d/%d", stats.succeedCount, stats.failureCount, 
-          stats.cancelCount, stats.testCount]; 
+  return [NSString stringWithFormat:@"%ld/%ld/%ld/%ld", (long)stats.succeedCount, (long)stats.failureCount,
+         (long) stats.cancelCount, (long)stats.testCount];
 }
 
 BOOL GHTestStatusIsRunning(GHTestStatus status) {

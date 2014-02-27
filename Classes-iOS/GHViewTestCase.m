@@ -272,11 +272,11 @@
   }
 
   // View testing file names have the format [test class name]-[test selector name]-[UIScreen scale]-[# of verify in selector]-[view class name]
-  NSString *imageFilenamePrefix = [NSString stringWithFormat:@"%@-%@-%1.0f-%d-%@",
+  NSString *imageFilenamePrefix = [NSString stringWithFormat:@"%@-%@-%1.0f-%ld-%@",
                                    NSStringFromClass([self class]),
                                    NSStringFromSelector(currentSelector_),
                                    [[UIScreen mainScreen] scale],
-                                   imageVerifyCount_,
+                                   (long)imageVerifyCount_,
                                    NSStringFromClass([view class])];
   NSString *imageFilename = [imageFilenamePrefix stringByAppendingString:@".png"];
   NSString *systemVersion = [[UIDevice currentDevice] systemVersion];
