@@ -30,12 +30,12 @@
 #import "GHAsyncTestCase.h"
 #import <objc/runtime.h>
 
-typedef enum {
+typedef NS_ENUM(NSInteger, GHUnitAsyncError) {
   kGHUnitAsyncErrorNone,
   kGHUnitAsyncErrorUnprepared,
   kGHUnitAsyncErrorTimedOut,
   kGHUnitAsyncErrorInvalidStatus
-} GHUnitAsyncError;
+};
 
 @implementation GHAsyncTestCase
 

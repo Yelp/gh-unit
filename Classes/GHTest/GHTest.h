@@ -45,14 +45,14 @@ extern NSString *const GHUnitViewTestPassNotificiation;
 /*!
  Test status.
  */
-typedef enum {
+typedef NS_ENUM(NSInteger, GHTestStatus) {
   GHTestStatusNone = 0,
   GHTestStatusRunning, //! Test is running
   GHTestStatusCancelling, //! Test is being cancelled
   GHTestStatusCancelled, //! Test was cancelled
   GHTestStatusSucceeded, //! Test finished and succeeded
   GHTestStatusErrored, //! Test finished and errored
-} GHTestStatus;
+};
 
 enum {
   GHTestOptionReraiseExceptions = 1 << 0, // Allows exceptions to be raised (so you can trigger the debugger)
