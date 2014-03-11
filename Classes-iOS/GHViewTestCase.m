@@ -127,6 +127,8 @@
 #pragma mark Image Operations
 
 + (UIImage *)imageWithView:(UIView *)view {
+  // Layout view if not in steady state, needed for views that use autolayout
+  [view layoutIfNeeded];
   [view setNeedsDisplay];
   UIGraphicsBeginImageContextWithOptions(view.frame.size, NO, [[UIScreen mainScreen] scale]);
   CALayer *layer = view.layer;
