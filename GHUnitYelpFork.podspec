@@ -5,18 +5,15 @@ Pod::Spec.new do |s|
   s.homepage     = "http://github.com/Yelp/gh-unit"
   s.license      = "MIT"
   s.author       = "Yelp"
-  s.source       = { :git => 'https://github.com/Yelp/gh-kit', :tag => 'v' + s.version.to_s }  
+  s.source       = { :git => 'https://github.com/Yelp/gh-unit.git', :tag => 'v' + s.version.to_s }  
   s.requires_arc = true
   s.header_dir   = "GHUnit"
 
+  s.weak_framework = "UIKit"
+
+  s.platform = :ios
   s.ios.deployment_target = "6.0"
-  s.osx.deployment_target = "10.7"
 
-  s.public_header_files = "Classes/**/*.h"
-  s.ios.public_header_files = "Classes-iOS/**/*.h"
-  s.osx.public_header_files = "Classes-MacOSX/**/*.h"
-
-  s.source_files = "Classes/**/*.{h,m}", "Libraries/GTM/**/*.{h,m}"
-  s.ios.source_files = "Classes-iOS/**/*.{h,m}"
-  s.osx.source_files = "Classes-MacOSX/**/*.{h,m}"
+  s.public_header_files = "Classes/**/*.h", "Classes-iOS/**/*.h"
+  s.source_files = "Classes/**/*.{h,m}", "Classes-iOS/**/*.{h,m}", "Libraries/GTM/**/*.{h,m}"
 end
