@@ -12,6 +12,10 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = "6.0"
   s.osx.deployment_target = "10.7"
 
+  s.public_header_files = "Classes/**/*.h"
+  s.ios.public_header_files = "Classes-iOS/**/*.h"
+  s.osx.public_header_files = "Classes-MacOSX/**/*.h"
+
   s.source_files = "Classes/**/*.{h,m}", "Libraries/GTM/**/*.{h,m}"
   s.ios.source_files = "Classes-iOS/**/*.{h,m}"
   s.osx.source_files = "Classes-MacOSX/**/*.{h,m}"
