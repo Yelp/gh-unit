@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
   s.homepage     = "http://github.com/Yelp/gh-unit"
   s.license      = "MIT"
   s.author       = "Yelp"
-  s.source       = { :git => 'https://github.com/Yelp/gh-kit', :tag => 'v#{s.version}' }  
+  s.source       = { :git => 'https://github.com/Yelp/gh-kit', :tag => 'v' + s.version.to_s }  
   s.requires_arc = true
   s.header_dir   = "GHUnit"
 
