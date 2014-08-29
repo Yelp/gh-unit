@@ -36,7 +36,7 @@ void GHRunForInterval(CFTimeInterval interval) {
   // 1. One testing strategy for time-dependent code is to mock NSDate methods using swizzling.
   // 2. CACurrentMediaTime() is better for relative timing since it's not subject to network time synchronization.
   CFTimeInterval runUntilTime = CACurrentMediaTime() + interval;
-  NSArray *runLoopModes = @[(NSString *)kCFRunLoopDefaultMode, (NSString *)kCFRunLoopCommonModes];
+  NSArray *runLoopModes = @[(NSString *)kCFRunLoopDefaultMode];
   NSInteger runIndex = 0;
   while (CACurrentMediaTime() < runUntilTime) {
     NSString *mode = runLoopModes[(runIndex++ % [runLoopModes count])];
