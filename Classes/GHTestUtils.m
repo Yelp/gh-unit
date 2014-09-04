@@ -55,4 +55,7 @@ void GHRunUntilTimeoutWhileBlock(CFTimeInterval timeout, BOOL(^whileBlock)()) {
   while (whileBlock() && (CACurrentMediaTime() < endTime)) {
     GHRunForInterval(0.1);
   }
+  if (whileBlock()) {
+    NSCAssert(NO, @"GHRunUntilTimeoutWhileBlock / GHRunWhile timed out.");
+  }
 }
