@@ -58,6 +58,6 @@ void GHRunUntilTimeoutWhileBlock(CFTimeInterval timeout, BOOL(^whileBlock)()) {
     GHRunForInterval(0.1);
   }
   if (runWhileResult) {
-    NSCAssert(NO, @"GHRunUntilTimeoutWhileBlock / GHRunWhile timed out.");
+    NSLog(@"WARNING: GHRunUntilTimeoutWhileBlock / GHRunWhile block timed out.");
   }
 }
