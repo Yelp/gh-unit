@@ -90,6 +90,7 @@ static const CGFloat kOverlayViewVerticalMargin = 10.0;
     [_savedImageView.layer setBorderColor:[UIColor blackColor].CGColor];
     _savedImageView.hidden = YES;
     _savedImageView.translatesAutoresizingMaskIntoConstraints = NO;
+    _savedImageView.backgroundColor = [UIColor grayColor];
     [_contentView addSubview:_savedImageView];
     
     _renderedImageView = [[GHUIImageViewControl alloc] init];
@@ -98,6 +99,7 @@ static const CGFloat kOverlayViewVerticalMargin = 10.0;
     [_renderedImageView.layer setBorderColor:[UIColor blackColor].CGColor];
     _renderedImageView.hidden = YES;
     _renderedImageView.translatesAutoresizingMaskIntoConstraints = NO;
+    _renderedImageView.backgroundColor = [UIColor grayColor];
     [_contentView addSubview:_renderedImageView];
     
     _approveButton = [UIButton buttonWithType:UIButtonTypeSystem];
