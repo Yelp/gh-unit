@@ -66,7 +66,6 @@
     filterControl_ = [[UISegmentedControl alloc] initWithItems:@[@"All", @"Failed"]];
     filterControl_.frame = CGRectMake(20, 6, 280, 24);
     filterControl_.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    filterControl_.segmentedControlStyle = UISegmentedControlStyleBar;
     [runToolbar_ addSubview:filterControl_];
     [self addSubview:runToolbar_];
   }

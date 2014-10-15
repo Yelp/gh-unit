@@ -34,7 +34,7 @@
 - (id)initWithFrame:(CGRect)frame {
   if ((self = [super initWithFrame:frame])) {
     scrollView_ = [[UIScrollView alloc] initWithFrame:CGRectZero];
-    scrollView_.backgroundColor = [UIColor scrollViewTexturedBackgroundColor];
+    scrollView_.backgroundColor = [UIColor grayColor];
     scrollView_.contentInset = UIEdgeInsetsMake(0, 0, 50, 0);
     [self addSubview:scrollView_];
 

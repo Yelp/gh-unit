@@ -91,6 +91,12 @@ BOOL isTestFixtureOfClass(Class aClass, Class testCaseClass) {
 }
 // GTM_END
 
+// Added in order to supress the warnings below about "undeclared selector {_setUp,_tearDown}
+@interface NSObject ()
+- (void)_setUp;
+- (void)_tearDown;
+@end
+
 @implementation GHTesting
 
 static GHTesting *gSharedInstance;
@@ -179,52 +185,6 @@ static GHTesting *gSharedInstance;
 
 // GTM_BEGIN
 
-/*
-- (NSArray *)loadTestsFromTarget:(id)target {
-  NSMutableArray *tests = [NSMutableArray array];
-  
-  unsigned int methodCount;
-  Method *methods = class_copyMethodList([target class], &methodCount);
-  if (!methods) {
-    return nil;
-  }
-  // This handles disposing of methods for us even if an
-  // exception should fly. 
-  [NSData dataWithBytesNoCopy:methods
-                       length:sizeof(Method) * methodCount];
-  // Sort our methods so they are called in Alphabetical order just
-  // because we can.
-  qsort(methods, methodCount, sizeof(Method), MethodSort);
-  for (size_t j = 0; j < methodCount; ++j) {
-    Method currMethod = methods[j];
-    SEL sel = method_getName(currMethod);
-    char *returnType = NULL;
-    const char *name = sel_getName(sel);
-    // If it starts with test, takes 2 args (target and sel) and returns
-    // void run it.
-    if (strstr(name, "test") == name) {
-      returnType = method_copyReturnType(currMethod);
-      if (returnType) {
-        // This handles disposing of returnType for us even if an
-        // exception should fly. Length +1 for the terminator, not that
-        // the length really matters here, as we never reference inside
-        // the data block.
-        [NSData dataWithBytesNoCopy:returnType
-                             length:strlen(returnType) + 1];
-      }
-    }
-    if (returnType  // True if name starts with "test"
-        && strcmp(returnType, @encode(void)) == 0
-        && method_getNumberOfArguments(currMethod) == 2) {
-      
-      GHTest *test = [GHTest testWithTarget:target selector:sel];
-      [tests addObject:test];
-    }
-  }
-  
-  return tests;
-}
-*/
 - (NSArray *)loadTestsFromTarget:(id)target {
   NSMutableArray *invocations = nil;
   // Need to walk all the way up the parent classes collecting methods (in case
@@ -310,18 +270,22 @@ static GHTesting *gSharedInstance;
     // outer layers get the exceptions to report counts, etc.
       @try {
         // Private setUp internal to GHUnit (in case subclasses fail to call super)
-        if ([target respondsToSelector:@selector(_setUp)])
+        if ([target respondsToSelector:@selector(_setUp)]) {
           [target performSelector:@selector(_setUp)];
+        }
 
-        if ([target respondsToSelector:@selector(setUp)])
+        if ([target respondsToSelector:@selector(setUp)]) {
           [target performSelector:@selector(setUp)];
-        @try {  
-          if ([target respondsToSelector:@selector(setCurrentSelector:)])
+        }
+        @try {
+          if ([target respondsToSelector:@selector(setCurrentSelector:)]) {
             [target setCurrentSelector:selector];
+          }
 
           // If this isn't set SenTest macros don't raise
-          if ([target respondsToSelector:@selector(raiseAfterFailure)])
+          if ([target respondsToSelector:@selector(raiseAfterFailure)]) {
             [target raiseAfterFailure];
+          }
           
           // Runs the test
 #pragma clang diagnostic push
@@ -332,15 +296,18 @@ static GHTesting *gSharedInstance;
         } @catch (NSException *exception) {
           if (!testException) testException = exception;
         }
-        if ([target respondsToSelector:@selector(setCurrentSelector:)])
+        if ([target respondsToSelector:@selector(setCurrentSelector:)]) {
           [target setCurrentSelector:NULL];
+        }
 
-        if ([target respondsToSelector:@selector(tearDown)])
+        if ([target respondsToSelector:@selector(tearDown)]) {
           [target performSelector:@selector(tearDown)];
+        }
         
         // Private tearDown internal to GHUnit (in case subclasses fail to call super)
-        if ([target respondsToSelector:@selector(_tearDown)])
+        if ([target respondsToSelector:@selector(_tearDown)]) {
           [target performSelector:@selector(_tearDown)];
+        }
 
       } @catch (NSException *exception) {
         if (!testException) testException = exception;
