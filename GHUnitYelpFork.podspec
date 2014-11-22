@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "GHUnitYelpFork"
-  s.version      = "1.0.4"
+  s.version      = "1.0.5"
   s.summary      = "GHUnit is a test framework for Mac OS X and iOS. It can be used standalone or with other testing frameworks like SenTestingKit or GTM."
   s.homepage     = "http://github.com/Yelp/gh-unit"
   s.license      = "MIT"
