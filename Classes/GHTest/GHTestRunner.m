@@ -92,6 +92,7 @@ operationQueue=operationQueue_;
   GHTestSuite *suite = [GHTestSuite suiteFromEnv];
   GHTestRunner *runner = [GHTestRunner runnerForSuite:suite];
   if (getenv("GHUNIT_RERAISE")) runner.options = GHTestOptionReraiseExceptions;
+  runner.options |= GHTestOptionIgnoreViewTestNotification;
   return runner;
 } 
 

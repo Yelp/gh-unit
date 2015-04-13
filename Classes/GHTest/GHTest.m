@@ -216,7 +216,10 @@ exception=exception_, status=status_, log=log_, identifier=identifier_, disabled
 
   BOOL reraiseExceptions = ((options & GHTestOptionReraiseExceptions) == GHTestOptionReraiseExceptions);
   NSException *exception = nil;
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_viewTestPassedNotification:) name:GHUnitViewTestPassNotificiation object:nil];
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:GHUnitViewTestPassNotificiation object:nil];
+  if ((options & GHTestOptionIgnoreViewTestNotification) != GHTestOptionIgnoreViewTestNotification) {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_viewTestPassedNotification:) name:GHUnitViewTestPassNotificiation object:nil];
+  }
   [GHTesting runTestWithTarget:target_ selector:selector_ exception:&exception interval:&interval_ reraiseExceptions:reraiseExceptions];
   [[NSNotificationCenter defaultCenter] removeObserver:self name:GHUnitViewTestPassNotificiation object:nil];
   exception_ = exception;

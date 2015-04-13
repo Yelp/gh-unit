@@ -57,6 +57,7 @@ typedef NS_ENUM(NSInteger, GHTestStatus) {
 enum {
   GHTestOptionReraiseExceptions = 1 << 0, // Allows exceptions to be raised (so you can trigger the debugger)
   GHTestOptionForceSetUpTearDownClass = 1 << 1, // Runs setUpClass/tearDownClass for this (each) test; Used when re-running a single test in a group
+  GHTestOptionIgnoreViewTestNotification = 1 << 2, // Test will not setup an observer for GHUnitViewTestPassNotificiation
 };
 typedef NSInteger GHTestOptions;
 

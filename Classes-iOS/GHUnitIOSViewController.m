@@ -129,7 +129,7 @@ NSString *const GHUnitFilterKey = @"Filter";
   userDidDrag_ = NO; // Reset drag status
   view_.statusLabel.textColor = [UIColor blackColor];
   view_.statusLabel.text = @"Starting tests...";
-  [self.dataSource run:self inParallel:NO options:0];
+  [self.dataSource run:self inParallel:NO options:GHTestOptionIgnoreViewTestNotification];
 }
 
 - (void)cancel {
