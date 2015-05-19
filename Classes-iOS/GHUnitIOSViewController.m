@@ -187,7 +187,7 @@ NSString *const GHUnitFilterKey = @"Filter";
   [view_.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
   if (!userDidDrag_ && !dataSource_.isEditing && ![test isDisabled]
       && [test status] == GHTestStatusRunning && ![test conformsToProtocol:@protocol(GHTestGroup)]) 
-    [self scrollToTest:test];
+    [view_.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
 }
 
 - (void)scrollToTest:(id<GHTest>)test {
