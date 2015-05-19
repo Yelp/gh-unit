@@ -53,7 +53,6 @@
 
 - (void)reloadTest:(id<GHTest>)test;
 
-- (void)scrollToTest:(id<GHTest>)test;
 - (void)scrollToBottom;
 
 - (void)setStatusText:(NSString *)message;

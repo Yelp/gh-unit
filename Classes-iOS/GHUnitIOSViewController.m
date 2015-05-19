@@ -190,12 +190,6 @@ NSString *const GHUnitFilterKey = @"Filter";
     [view_.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
 }
 
-- (void)scrollToTest:(id<GHTest>)test {
-  NSIndexPath *path = [dataSource_ indexPathToTest:test];
-  if (!path) return;
-  [view_.tableView scrollToRowAtIndexPath:path atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
-}
-
 - (void)scrollToBottom {
   NSInteger lastGroupIndex = [dataSource_ numberOfGroups] - 1;
   if (lastGroupIndex < 0) return;
