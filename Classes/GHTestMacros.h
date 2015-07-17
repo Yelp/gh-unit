@@ -722,7 +722,7 @@ withDescription:GHComposeString(description, ##__VA_ARGS__)]]; \
  */
 #define GHAssertTrue(expr, description, ...) \
 do { \
-BOOL _evaluatedExpression = (expr);\
+BOOL _evaluatedExpression = !!(expr);\
 if (!_evaluatedExpression) {\
 NSString *_expression = [NSString stringWithUTF8String: #expr];\
 [self failWithException:[NSException ghu_failureInCondition: _expression \
@@ -745,7 +745,7 @@ withDescription: GHComposeString(description, ##__VA_ARGS__)]]; \
 #define GHAssertTrueNoThrow(expr, description, ...) \
 do { \
 @try {\
-BOOL _evaluatedExpression = (expr);\
+BOOL _evaluatedExpression = !!(expr);\
 if (!_evaluatedExpression) {\
 NSString *_expression = [NSString stringWithUTF8String: #expr];\
 [self failWithException:[NSException ghu_failureInCondition: _expression \
@@ -774,7 +774,7 @@ withDescription:GHComposeString(description, ##__VA_ARGS__)]]; \
  */
 #define GHAssertFalse(expr, description, ...) \
 do { \
-BOOL _evaluatedExpression = (expr);\
+BOOL _evaluatedExpression = !!(expr);\
 if (_evaluatedExpression) {\
 NSString *_expression = [NSString stringWithUTF8String: #expr];\
 [self failWithException:[NSException ghu_failureInCondition: _expression \
@@ -797,7 +797,7 @@ withDescription: GHComposeString(description, ##__VA_ARGS__)]]; \
 #define GHAssertFalseNoThrow(expr, description, ...) \
 do { \
 @try {\
-BOOL _evaluatedExpression = (expr);\
+BOOL _evaluatedExpression = !!(expr);\
 if (_evaluatedExpression) {\
 NSString *_expression = [NSString stringWithUTF8String: #expr];\
 [self failWithException:[NSException ghu_failureInCondition: _expression \
